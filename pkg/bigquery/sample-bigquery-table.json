@@ -1,0 +1,136 @@
+{
+  "kind" : "bigquery#table",
+  "id" : "lorem-ipsump-1234:incidentio.incident",
+  "selfLink" : "https://bigquery.googleapis.com/bigquery/v2/projects/lorem-ipsump-1234/datasets/incidentio/tables/incident",
+  "tableReference" : {
+    "projectId" : "lorem-ipsump-1234",
+    "datasetId" : "incidentio",
+    "tableId" : "incident"
+  },
+  "schema" : {
+    "fields" : [ {
+      "name" : "id",
+      "type" : "STRING",
+      "mode" : "NULLABLE"
+    }, {
+      "name" : "_fivetran_deleted",
+      "type" : "BOOLEAN",
+      "mode" : "NULLABLE"
+    }, {
+      "name" : "_fivetran_synced",
+      "type" : "TIMESTAMP",
+      "mode" : "NULLABLE"
+    }, {
+      "name" : "call_url",
+      "type" : "STRING",
+      "mode" : "NULLABLE"
+    }, {
+      "name" : "created_at",
+      "type" : "TIMESTAMP",
+      "mode" : "NULLABLE"
+    }, {
+      "name" : "creator_user_id",
+      "type" : "STRING",
+      "mode" : "NULLABLE"
+    }, {
+      "name" : "external_issue_reference_issue_name",
+      "type" : "STRING",
+      "mode" : "NULLABLE"
+    }, {
+      "name" : "external_issue_reference_issue_permalink",
+      "type" : "STRING",
+      "mode" : "NULLABLE"
+    }, {
+      "name" : "external_issue_reference_provider",
+      "type" : "STRING",
+      "mode" : "NULLABLE"
+    }, {
+      "name" : "incident_status_id",
+      "type" : "STRING",
+      "mode" : "NULLABLE"
+    }, {
+      "name" : "incident_type_id",
+      "type" : "STRING",
+      "mode" : "NULLABLE"
+    }, {
+      "name" : "mode",
+      "type" : "STRING",
+      "mode" : "NULLABLE"
+    }, {
+      "name" : "name",
+      "type" : "STRING",
+      "mode" : "NULLABLE"
+    }, {
+      "name" : "permalink",
+      "type" : "STRING",
+      "mode" : "NULLABLE"
+    }, {
+      "name" : "postmortem_document_url",
+      "type" : "STRING",
+      "mode" : "NULLABLE"
+    }, {
+      "name" : "reference",
+      "type" : "STRING",
+      "mode" : "NULLABLE"
+    }, {
+      "name" : "severity_id",
+      "type" : "STRING",
+      "mode" : "NULLABLE"
+    }, {
+      "name" : "slack_channel_id",
+      "type" : "STRING",
+      "mode" : "NULLABLE"
+    }, {
+      "name" : "slack_channel_name",
+      "type" : "STRING",
+      "mode" : "NULLABLE"
+    }, {
+      "name" : "slack_team_id",
+      "type" : "STRING",
+      "mode" : "NULLABLE"
+    }, {
+      "name" : "summary",
+      "type" : "STRING",
+      "mode" : "NULLABLE"
+    }, {
+      "name" : "updated_at",
+      "type" : "TIMESTAMP",
+      "mode" : "NULLABLE"
+    }, {
+      "name" : "visibility",
+      "type" : "STRING",
+      "mode" : "NULLABLE"
+    }, {
+      "name" : "workload_minutes_late",
+      "type" : "FLOAT",
+      "mode" : "NULLABLE"
+    }, {
+      "name" : "workload_minutes_sleeping",
+      "type" : "FLOAT",
+      "mode" : "NULLABLE"
+    }, {
+      "name" : "workload_minutes_total",
+      "type" : "FLOAT",
+      "mode" : "NULLABLE"
+    }, {
+      "name" : "workload_minutes_working",
+      "type" : "FLOAT",
+      "mode" : "NULLABLE"
+    } ]
+  },
+  "numBytes" : "661270",
+  "numLongTermBytes" : "0",
+  "numRows" : "696",
+  "creationTime" : "1729005625723",
+  "lastModifiedTime" : "1729531852129",
+  "type" : "TABLE",
+  "location" : "US",
+  "numTimeTravelPhysicalBytes" : "9692976",
+  "numTotalLogicalBytes" : "661270",
+  "numActiveLogicalBytes" : "661270",
+  "numLongTermLogicalBytes" : "0",
+  "numTotalPhysicalBytes" : "9917506",
+  "numActivePhysicalBytes" : "9917506",
+  "numLongTermPhysicalBytes" : "0",
+  "numCurrentPhysicalBytes" : "224530"
+}

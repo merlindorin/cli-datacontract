@@ -1,0 +1,123 @@
+{
+  "dataContractSpecification": "0.9.3",
+  "id": "my-data-contract-id",
+  "info": {
+    "title": "My Data Contract",
+    "version": "0.0.1"
+  },
+  "models": {
+    "incident": {
+      "type": "table",
+      "fields": {
+        "id": {
+          "type": "string",
+          "required": false
+        },
+        "_fivetran_deleted": {
+          "type": "boolean",
+          "required": false
+        },
+        "_fivetran_synced": {
+          "type": "timestamp",
+          "required": false
+        },
+        "call_url": {
+          "type": "string",
+          "required": false
+        },
+        "created_at": {
+          "type": "timestamp",
+          "required": false
+        },
+        "creator_user_id": {
+          "type": "string",
+          "required": false
+        },
+        "external_issue_reference_issue_name": {
+          "type": "string",
+          "required": false
+        },
+        "external_issue_reference_issue_permalink": {
+          "type": "string",
+          "required": false
+        },
+        "external_issue_reference_provider": {
+          "type": "string",
+          "required": false
+        },
+        "incident_status_id": {
+          "type": "string",
+          "required": false
+        },
+        "incident_type_id": {
+          "type": "string",
+          "required": false
+        },
+        "mode": {
+          "type": "string",
+          "required": false
+        },
+        "name": {
+          "type": "string",
+          "required": false
+        },
+        "permalink": {
+          "type": "string",
+          "required": false
+        },
+        "postmortem_document_url": {
+          "type": "string",
+          "required": false
+        },
+        "reference": {
+          "type": "string",
+          "required": false
+        },
+        "severity_id": {
+          "type": "string",
+          "required": false
+        },
+        "slack_channel_id": {
+          "type": "string",
+          "required": false
+        },
+        "slack_channel_name": {
+          "type": "string",
+          "required": false
+        },
+        "slack_team_id": {
+          "type": "string",
+          "required": false
+        },
+        "summary": {
+          "type": "string",
+          "required": false
+        },
+        "updated_at": {
+          "type": "timestamp",
+          "required": false
+        },
+        "visibility": {
+          "type": "string",
+          "required": false
+        },
+        "workload_minutes_late": {
+          "type": "float",
+          "required": false
+        },
+        "workload_minutes_sleeping": {
+          "type": "float",
+          "required": false
+        },
+        "workload_minutes_total": {
+          "type": "float",
+          "required": false
+        },
+        "workload_minutes_working": {
+          "type": "float",
+          "required": false
+        }
+      }
+    }
+  }
+}
