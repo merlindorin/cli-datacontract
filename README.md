@@ -13,7 +13,6 @@
 * [cli-datacontract](#cli-datacontract)
   * [Table of Contents](#table-of-contents)
   * [Summary](#summary)
-  * [Prerequisites](#prerequisites)
   * [Installation](#installation)
     * [Binaries via GitHub Releases](#binaries-via-github-releases)
     * [Script Installation](#script-installation)
@@ -23,22 +22,20 @@
     * [Commands:](#commands)
       * [Examples](#examples)
   * [Development](#development)
+    * [Prerequisites](#prerequisites)
+    * [Installing Aqua and Taskfile](#installing-aqua-and-taskfile)
+    * [Installing Tools with Aqua](#installing-tools-with-aqua)
+    * [Using Taskfile for Development](#using-taskfile-for-development)
+    * [Available Tasks](#available-tasks)
+    * [Repository Structure](#repository-structure)
   * [Contributing](#contributing)
+  * [References](#references)
   * [License](#license)
 <!-- TOC -->
 
 ## Summary
 
-`cli-datacontract` provides a command-line tool for importing data contracts, allowing seamless integration with remote
-sources or files, particularly centered around BigQuery operations. This tool enhances manageability and consistency
-across data workflows.
-
-## Prerequisites
-
-Ensure you have the following:
-
-- [Git](https://git-scm.com): For version control.
-- [Go language](https://golang.org/dl/): Needed if building the tool from source.
+`cli-datacontract` provides a command-line interface for importing datacontracts, allowing seamless integration with remote sources or files, particularly centered around BigQuery operations. This tool enhances manageability and consistency across data workflows.
 
 ## Installation
 
@@ -55,38 +52,35 @@ Ensure you have the following:
 ### Script Installation
 
 Use the installation script:
-
 ```bash
-curl -sSfL https://raw.githubusercontent.com/merlindorin/cli-datacontract/master/install.sh | sh -s -- -d 
+curl -sSfL https://raw.githubusercontent.com/merlindorin/cli-datacontract/master/install.sh | sh
 ```
 
 ### Run with Docker
 
-To run the `cli-datacontract` using Docker:
+For Docker users:
 
 1. Pull the Docker image:
    ```bash
-   docker pull ghcr.io/merlindorin/cli-datacontract:v0.0.1
+   docker pull ghcr.io/merlindorin/cli-datacontract:v0.0.2
    ```
 
 2. Run the container:
    ```bash
-   docker run --rm ghcr.io/merlindorin/cli-datacontract:v0.0.1 <command> [options]
+   docker run --rm ghcr.io/merlindorin/cli-datacontract:v0.0.2 <command> [options]
    ```
 
-   Replace `<command> [options]` with the specific command and options you wish to use (e.g.,
-   `bigquery remote --bigquery-projectid=myproject --bigquery-datasetid=mydataset --bigquery-tablename=mytable`).
+   Replace `<command> [options]` with the specific command and options you wish to use (e.g., `bigquery remote --bigquery-projectid=myproject --bigquery-datasetid=mydataset --bigquery-tablename=mytable`).
 
 ## Usage
 
 The `cli-datacontract` can be used with various commands and flags:
 
 ```bash
-Usage: cli-datacontract <command> [flags]
+Usage: datacontract <command> [flags]
 ```
 
 ### Common Flags:
-
 - `-h, --help`: Show help information.
 - `-D, --development`: Enable development mode with debug logging.
 - `-l, --level="info"`: Set the logging level (options: debug, info, warn, error, fatal).
@@ -110,7 +104,37 @@ cli-datacontract bigquery file schema.json
 
 ## Development
 
-To contribute to the project:
+### Prerequisites
+
+To develop in this project, ensure the following tools are installed:
+
+- [Git](https://git-scm.com): For version control.
+- [Go](https://golang.org/dl/): Necessary for building the CLI from source.
+- [Docker](https://www.docker.com/): For running the application in containers.
+- [Aqua](https://aquaproj.github.io): Efficiently manage CLI tool versions.
+- [Taskfile](https://taskfile.dev/): Task runner for consistently automating scripts.
+
+### Installing Aqua and Taskfile
+
+**Aqua:**
+1. Follow the [Aqua installation guide](https://aquaproj.github.io/docs/install) to set up Aqua CLI.
+
+**Taskfile:**
+1. Follow the [Taskfile installation guide](https://taskfile.dev/#/installation) to set up Taskfile CLI.
+
+### Installing Tools with Aqua
+
+Once Aqua is installed, run the following to install all necessary tools as specified in the `aqua.yaml` file:
+
+```bash
+aqua i
+```
+
+Aqua ensures all specified tools are installed and up-to-date, leveraging its centralized configuration for consistency across environments.
+
+### Using Taskfile for Development
+
+This project uses Taskfile to automate common development tasks. Upon cloning the repository:
 
 1. Clone the repository:
    ```bash
@@ -118,12 +142,52 @@ To contribute to the project:
    cd cli-datacontract
    ```
 
-2. For building and running tests, utilize Go's built-in tools. Ensure you are working on a feature branch:
+2. Run development tasks using Taskfile:
    ```bash
-   git checkout -b feature/your-feature
+   task
    ```
+   The above command will execute all the default tasks.
 
-3. Follow best practices for coding and testing.
+### Available Tasks
+
+Here are some of the tasks you can run using Taskfile:
+
+- **Git Tasks**:
+    - `git:gitignore`: Write common .gitignore file
+    - `git:install`: Install git pre-commit hook
+
+- **Golang Tasks**:
+    - `golangci:boilerplate`: Generate golang-ci configuration
+    - `golangci:ci`: Generate GitHub Action
+    - `golangci:fix`: Fix golang source
+    - `golangci:lint`: Lint golang source
+    - `golangci:run`: Run golang-ci
+
+- **Goreleaser Tasks**:
+    - `goreleaser:boilerplate`: Generate goreleaser configuration
+    - `goreleaser:ci`: Generate GitHub Action
+    - `goreleaser:install-script`: Generate an installation script
+    - `goreleaser:run`: Run goreleaser
+
+- **License Task**:
+    - `license:generate`: Generate License
+
+- **Markdown Tasks**:
+    - `markdownlint:boilerplate`: Generate markdownlint configuration
+    - `markdownlint:fix`: Fix markdown source
+    - `markdownlint:lint`: Lint markdown source
+
+- **Trufflehog Tasks**:
+    - `trufflehog:ci`: Generate GitHub Action
+    - `trufflehog:detect`: Detect secret leaks in the current repository
+
+### Repository Structure
+
+- **cmd**: Contains the main application entry sources.
+- **pkg**: Houses package level utilities and libraries.
+- **.github**: GitHub-specific configurations, like actions.
+- **Taskfile.yaml**: Central task automation configuration.
+- **aqua.yaml**: Specifies CLI tools and versions.
 
 ## Contributing
 
@@ -132,6 +196,13 @@ To contribute to the project:
 - Commit your changes: `git commit -am 'Add a feature'`.
 - Push to the branch: `git push origin feature/your-feature`.
 - Open a pull request for review.
+
+## References
+
+- [Datacontracts Project](https://datacontract.com/)
+- [Datacontracts Specification on GitHub](https://github.com/datacontract/datacontract-specification)
+- [GitHub Container Registry for cli-datacontract](https://ghcr.io/merlindorin/cli-datacontract)
+- [Google BigQuery](https://cloud.google.com/bigquery/)
 
 ## License
 
