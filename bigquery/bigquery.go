@@ -5,9 +5,12 @@ import (
 	"fmt"
 
 	"cloud.google.com/go/bigquery"
-	"github.com/merlindorin/cli-datacontract/pkg/schema"
+	"github.com/merlindorin/cli-datacontract/schema"
 )
 
+// ImportSchema imports the schema for a BigQuery table into the provided
+// datacontract. It maps the BigQuery table and field types to the corresponding
+// schema types and stores them in the datacontract's models.
 func ImportSchema(
 	tableName string,
 	tableDescription string,
@@ -48,6 +51,8 @@ func ImportSchema(
 	return nil
 }
 
+// MapFieldType converts a BigQuery field type to the corresponding
+// schema.FieldType. It returns an error if the field type is unknown.
 func MapFieldType(t bigquery.FieldType) (*schema.FieldType, error) {
 	switch t {
 	case bigquery.StringFieldType:
@@ -87,6 +92,8 @@ func MapFieldType(t bigquery.FieldType) (*schema.FieldType, error) {
 	return nil, errors.New("unknown field type")
 }
 
+// MapTableType converts a BigQuery table type to the corresponding
+// schema.Type. It returns an error if the table type is unknown.
 func MapTableType(t bigquery.TableType) (*schema.Type, error) {
 	switch t {
 	case bigquery.Snapshot, bigquery.ExternalTable, bigquery.RegularTable:

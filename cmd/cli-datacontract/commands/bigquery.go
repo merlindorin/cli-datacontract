@@ -11,16 +11,18 @@ import (
 	"path/filepath"
 
 	bq "cloud.google.com/go/bigquery"
-	"github.com/merlindorin/cli-datacontract/pkg/bigquery"
-	"github.com/merlindorin/cli-datacontract/pkg/schema"
+	"github.com/merlindorin/cli-datacontract/bigquery"
+	"github.com/merlindorin/cli-datacontract/schema"
+	"github.com/merlindorin/go-shared/pkg/cmd"
+	"google.golang.org/api/iterator"
 	"gopkg.in/yaml.v3"
 )
 
 type BigqueryCMD struct {
-	Remote BigqueryRemoteCMD `cmd:"remote" help:"import datacontract from remote"`
+	All    BigqueryAllCMD    `cmd:"remote" help:"import datacontracts from all datasets and dataname in project"`
+	Single BigquerySingleCMD `cmd:"single" help:"import datacontract from a single remote tablename"`
 	File   BigqueryFileCMD   `cmd:"file" help:"import datacontract from a file"`
 
-	Out    string `name:"out" short:"o" help:"Output filename; defaults to stdout if not specified"`
 	Format string `name:"format" default:"yaml" short:"f" enum:"json,yaml" help:"Specify the output format"`
 
 	DatacontractID               string `name:"datacontract-id" help:"Unique identifier for the datacontract"`
@@ -31,14 +33,96 @@ type BigqueryCMD struct {
 	DatacontractModelDescription string `name:"datacontract-model-description" help:"Description for the BigQuery table of the datacontract model"`
 }
 
-type BigqueryRemoteCMD struct {
+type BigqueryAllCMD struct {
+	Directory string `arg:"directory" optional:"" short:"d" help:"Output directory; defaults to the stdout"`
+	ProjectID string `name:"bigquery-projectid" required:"" help:"Unique identifier for the BigQuery project"`
+}
+
+func (i *BigqueryAllCMD) Run(parent *BigqueryCMD, co *cmd.Commons) error {
+	ctx := context.Background()
+	p := co.Printer()
+
+	c, err := bq.NewClient(ctx, i.ProjectID)
+	if err != nil {
+		return fmt.Errorf("cannot create bigquery client: %w", err)
+	}
+
+	datasetsIterator := c.Datasets(ctx)
+	for {
+		ds, derr := datasetsIterator.Next()
+		if errors.Is(derr, iterator.Done) {
+			break
+		}
+
+		if derr != nil {
+			return fmt.Errorf("error iterating datasets: %w", derr)
+		}
+
+		tablesIterator := ds.Tables(ctx)
+		for {
+			table, terr := tablesIterator.Next()
+			if errors.Is(terr, iterator.Done) {
+				break
+			}
+
+			if terr != nil {
+				return fmt.Errorf("error iterating tables: %w", terr)
+			}
+
+			out := os.Stdout
+
+			if i.Directory != "" {
+				name := fmt.Sprintf("%s-%s.%s", table.DatasetID, table.TableID, "json")
+				filename := filepath.Join(filepath.Clean(i.Directory), name)
+
+				out, terr = os.Create(filename)
+				if terr != nil {
+					return fmt.Errorf("cannot create output file: %w", terr)
+				}
+				defer func() {
+					terr = errors.Join(terr, out.Close())
+				}()
+			}
+
+			metadata, terr := table.Metadata(ctx)
+			if terr != nil {
+				return fmt.Errorf("cannot get table metadata: %w", terr)
+			}
+
+			tableName := metadata.FullID
+			tableDescription := metadata.Description
+			tableType := metadata.Type
+			tableSchema := metadata.Schema
+
+			terr = process(parent, out, tableName, tableDescription, tableType, tableSchema)
+			if terr != nil {
+				return fmt.Errorf("cannot import datacontract from remote: %w", terr)
+			}
+
+			p.Printf(
+				"Table collected: projectID=%s, datasetID=%s, tableID=%s, file=%s\n",
+				table.ProjectID,
+				table.DatasetID,
+				table.TableID,
+				out.Name(),
+			)
+		}
+	}
+
+	return nil
+}
+
+type BigquerySingleCMD struct {
+	Out string `name:"out" short:"o" help:"Output filename; defaults to stdout if not specified"`
+
 	ProjectID string `name:"bigquery-projectid" required:"" help:"Unique identifier for the BigQuery project"`
 	DatasetID string `name:"bigquery-datasetid" required:"" help:"Unique identifier for the BigQuery dataset"`
 	TableName string `name:"bigquery-tablename" required:"" help:"Unique identifier for the BigQuery table"`
 }
 
-func (i *BigqueryRemoteCMD) Run(parent *BigqueryCMD) error {
+func (i *BigquerySingleCMD) Run(parent *BigqueryCMD, co *cmd.Commons) error {
 	ctx := context.Background()
+	p := co.Printer()
 
 	c, err := bq.NewClient(ctx, i.ProjectID)
 	if err != nil {
@@ -55,20 +139,43 @@ func (i *BigqueryRemoteCMD) Run(parent *BigqueryCMD) error {
 	tableType := metadata.Type
 	tableSchema := metadata.Schema
 
-	err = process(parent, tableName, tableDescription, tableType, tableSchema)
+	out := os.Stdout
+
+	if i.Out != "" {
+		out, err = os.Create(filepath.Clean(i.Out))
+		if err != nil {
+			return fmt.Errorf("cannot create output file: %w", err)
+		}
+		defer func() {
+			err = errors.Join(err, out.Close())
+		}()
+	}
+
+	err = process(parent, out, tableName, tableDescription, tableType, tableSchema)
 	if err != nil {
 		return fmt.Errorf("cannot import datacontract from remote: %w", err)
 	}
+
+	p.Printf(
+		"Table collected: projectID=%s, datasetID=%s, tableID=%s, file=%s\n",
+		i.ProjectID,
+		i.DatasetID,
+		tableName,
+		out.Name(),
+	)
 
 	return nil
 }
 
 type BigqueryFileCMD struct {
+	Out string `name:"out" short:"o" help:"Output filename; defaults to stdout if not specified"`
+
 	Filename string `name:"bigquery-filename" arg:"" required:"" help:"Bigquery filename"`
 }
 
-func (i *BigqueryFileCMD) Run(parent *BigqueryCMD) error {
+func (i *BigqueryFileCMD) Run(parent *BigqueryCMD, co *cmd.Commons) error {
 	f := BigqueryFile{}
+	p := co.Printer()
 
 	file, err := os.Open(i.Filename)
 	if err != nil {
@@ -84,16 +191,35 @@ func (i *BigqueryFileCMD) Run(parent *BigqueryCMD) error {
 	tableType := f.Type
 	tableSchema := f.Schema.Fields
 
-	err = process(parent, tableName, "", tableType, tableSchema)
+	out := os.Stdout
+
+	if i.Out != "" {
+		out, err = os.Create(filepath.Clean(i.Out))
+		if err != nil {
+			return fmt.Errorf("cannot create output file: %w", err)
+		}
+		defer func() {
+			err = errors.Join(err, out.Close())
+		}()
+	}
+
+	err = process(parent, out, tableName, "", tableType, tableSchema)
 	if err != nil {
 		return fmt.Errorf("cannot process bigquery file: %w", err)
 	}
+
+	p.Printf(
+		"Table collected: tableID=%s, file=%s\n",
+		tableName,
+		out.Name(),
+	)
 
 	return nil
 }
 
 func process(
 	parent *BigqueryCMD,
+	out io.Writer,
 	tableName string,
 	tableDescription string,
 	tableType bq.TableType,
@@ -143,22 +269,9 @@ func process(
 		}
 	}
 
-	reader := bytes.NewReader(indent)
-
-	out := os.Stdout
-	if parent.Out != "" {
-		out, err = os.Create(filepath.Clean(parent.Out))
-		if err != nil {
-			return fmt.Errorf("cannot create output file: %w", err)
-		}
-		defer func() {
-			err = errors.Join(err, out.Close())
-		}()
-	}
-
-	_, err = io.Copy(out, reader)
+	_, err = io.Copy(out, bytes.NewReader(indent))
 	if err != nil {
-		return fmt.Errorf("cannot write to output file %s: %w", out.Name(), err)
+		return fmt.Errorf("cannot write to output: %w", err)
 	}
 
 	return nil

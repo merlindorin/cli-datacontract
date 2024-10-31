@@ -5,8 +5,8 @@ import (
 	"testing"
 
 	bq "cloud.google.com/go/bigquery"
-	"github.com/merlindorin/cli-datacontract/pkg/bigquery"
-	"github.com/merlindorin/cli-datacontract/pkg/schema"
+	"github.com/merlindorin/cli-datacontract/bigquery"
+	"github.com/merlindorin/cli-datacontract/schema"
 	"github.com/stretchr/testify/assert"
 )
 

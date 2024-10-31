@@ -41,6 +41,5 @@ func main() {
 		kong.Description("CLI for importing Datacontracts from different sources"),
 		kong.UsageOnError(),
 	)
-
 	ctx.FatalIfErrorf(ctx.Run(cli.Commons))
 }
