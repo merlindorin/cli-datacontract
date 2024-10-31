@@ -4,7 +4,7 @@ import (
 	_ "embed"
 	"testing"
 
-	"github.com/merlindorin/cli-datacontract/pkg/schema"
+	"github.com/merlindorin/cli-datacontract/schema"
 	"github.com/stretchr/testify/assert"
 )
 

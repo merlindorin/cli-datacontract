@@ -5,7 +5,7 @@ go 1.23.1
 require (
 	cloud.google.com/go/bigquery v1.63.1
 	github.com/alecthomas/kong v1.2.1
-	github.com/merlindorin/go-shared v0.0.0-20240902192331-689a482816bd
+	github.com/merlindorin/go-shared v0.0.0-20241031011908-1365e5515049
 	github.com/stretchr/testify v1.9.0
 )
 
