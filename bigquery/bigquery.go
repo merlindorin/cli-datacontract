@@ -1,7 +1,6 @@
 package bigquery
 
 import (
-	"errors"
 	"fmt"
 
 	"cloud.google.com/go/bigquery"
@@ -59,11 +58,11 @@ func MapFieldType(t bigquery.FieldType) (*schema.FieldType, error) {
 		return schema.NewFieldTypeReference(schema.FieldTypeString), nil
 	case bigquery.BytesFieldType:
 		return schema.NewFieldTypeReference(schema.FieldTypeBytes), nil
-	case bigquery.IntegerFieldType:
+	case bigquery.IntegerFieldType, "INT64":
 		return schema.NewFieldTypeReference(schema.FieldTypeInteger), nil
-	case bigquery.FloatFieldType:
+	case bigquery.FloatFieldType, "FLOAT64":
 		return schema.NewFieldTypeReference(schema.FieldTypeFloat), nil
-	case bigquery.BooleanFieldType:
+	case bigquery.BooleanFieldType, "BOOL":
 		return schema.NewFieldTypeReference(schema.FieldTypeBoolean), nil
 	case bigquery.TimestampFieldType:
 		return schema.NewFieldTypeReference(schema.FieldTypeTimestamp), nil
@@ -73,15 +72,15 @@ func MapFieldType(t bigquery.FieldType) (*schema.FieldType, error) {
 		return schema.NewFieldTypeReference(schema.FieldTypeDate), nil
 	case bigquery.DateTimeFieldType:
 		return schema.NewFieldTypeReference(schema.FieldTypeTimestamp), nil
-	case bigquery.NumericFieldType:
+	case bigquery.NumericFieldType, "DECIMAL":
 		return schema.NewFieldTypeReference(schema.FieldTypeNumeric), nil
-	case bigquery.BigNumericFieldType:
+	case bigquery.BigNumericFieldType, "BIGDECIMAL":
 		return schema.NewFieldTypeReference(schema.FieldTypeDouble), nil
 	case bigquery.GeographyFieldType:
 		return schema.NewFieldTypeReference(schema.FieldTypeObject), nil
 	case bigquery.JSONFieldType:
 		return schema.NewFieldTypeReference(schema.FieldTypeObject), nil
-	case bigquery.RecordFieldType:
+	case bigquery.RecordFieldType, "STRUCT":
 		return schema.NewFieldTypeReference(schema.FieldTypeObject), nil
 	case bigquery.IntervalFieldType:
 		return schema.NewFieldTypeReference(schema.FieldTypeInt), nil
@@ -89,7 +88,7 @@ func MapFieldType(t bigquery.FieldType) (*schema.FieldType, error) {
 		return schema.NewFieldTypeReference(schema.FieldTypeInt), nil
 	}
 
-	return nil, errors.New("unknown field type")
+	return nil, fmt.Errorf("unknown field type: %s", t)
 }
 
 // MapTableType converts a BigQuery table type to the corresponding
@@ -101,6 +100,6 @@ func MapTableType(t bigquery.TableType) (*schema.Type, error) {
 	case bigquery.ViewTable, bigquery.MaterializedView:
 		return schema.NewTypeReference(schema.TypeView), nil
 	default:
-		return nil, errors.New("unknown table type")
+		return nil, fmt.Errorf("unknown table type: `%s`", t)
 	}
 }

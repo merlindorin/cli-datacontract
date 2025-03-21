@@ -168,7 +168,8 @@ func (i *BigquerySingleCMD) Run(parent *BigqueryCMD, co *cmd.Commons) error {
 }
 
 type BigqueryFileCMD struct {
-	Out string `name:"out" short:"o" help:"Output filename; defaults to stdout if not specified"`
+	Out        string `name:"out" short:"o" help:"Output filename; defaults to stdout if not specified"`
+	SchemaOnly bool   `name:"bigquery-schema-only" help:"Bigquery schema only"`
 
 	Filename string `name:"bigquery-filename" arg:"" required:"" help:"Bigquery filename"`
 }
@@ -182,7 +183,13 @@ func (i *BigqueryFileCMD) Run(parent *BigqueryCMD, co *cmd.Commons) error {
 		return fmt.Errorf("cannot open file: %w", err)
 	}
 
-	err = json.NewDecoder(file).Decode(&f)
+	if i.SchemaOnly {
+		err = json.NewDecoder(file).Decode(&f.Schema.Fields)
+		f.Type = bq.ViewTable
+	} else {
+		err = json.NewDecoder(file).Decode(&f)
+	}
+
 	if err != nil {
 		return fmt.Errorf("cannot parse file: %w", err)
 	}
